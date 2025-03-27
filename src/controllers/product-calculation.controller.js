@@ -4,7 +4,17 @@ export const getUserCalculations = async (req, res) => {
   try {
     const userId = req.user.id;
     const calculations = await ProductCalculation.find({ userId }).sort({ createdAt: -1 });
-    res.json(calculations);
+
+    const roundedCalculations = calculations.map((calc) => ({
+      ...calc.toObject(),
+      landedCost: parseFloat(calc.landedCost.toFixed(2)),
+      finalCOG: parseFloat(calc.finalCOG.toFixed(2)),
+      suggestedPrice: parseFloat(calc.suggestedPrice.toFixed(2)),
+      profit: parseFloat(calc.profit.toFixed(2)),
+      profitMargin: parseFloat(calc.profitMargin.toFixed(2)),
+    }));
+
+    res.json(roundedCalculations);
   } catch (error) {
     res.status(500).json({ message: "Error fetching calculations", error });
   }
